@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--导入数据库连接池配置文件-->
+    <import resource="applicationContext-datasource-dbcp.xml"/>
+
+    <!--Mybatis核心对象-->
+    <!--配置sqlSessionFactory，SqlSessionFactoryBean来自mybatis-spring整合包-->
+    <!--<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">-->
+    <!--自定义sqlsessionfactory类，覆写buildSqlSessionFactory方法，解决mapper错误信息，控制台不打印的问题-->
+    <bean id="sqlSessionFactory" class="com.ares.util.MySqlSessionFactory">
+        <!--数据源-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--别名:可以配置多个,多个包之间用逗号隔开-->
+        <property name="typeAliasesPackage" value="com.ares.domain,com.ares.query"/>
+        <!--扫描映射器-->
+        <property name="mapperLocations" value="classpath*:com/ares/mapper/*Mapper.xml"/>
+    </bean>
+
+    <!--扫描Mapper接口-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.ares.mapper"/>
+    </bean>
+</beans>

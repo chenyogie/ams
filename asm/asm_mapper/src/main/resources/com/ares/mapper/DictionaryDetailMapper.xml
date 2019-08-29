@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ares.mapper.DictionaryDetailMapper">
+
+    <select id="loadDocStateType" resultType="DictionaryDetail">
+        select dide.id, dide.name
+        from t_dictionarydetail dide
+        WHERE types_id = 1
+    </select>
+
+    <!--根据字典类型查找对应的字典数据-->
+    <select id="loadByType" parameterType="String" resultType="DictionaryDetail">
+        select d.*
+        from t_dictionarydetail d
+        LEFT JOIN t_dictionarytype t
+        on t.id = d.types_id
+        where t.sncode = #{certificatetype}
+    </select>
+
+</mapper>

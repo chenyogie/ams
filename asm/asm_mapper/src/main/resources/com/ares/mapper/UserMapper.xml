@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ares.mapper.UserMapper">
+    <insert id="save" parameterType="user">
+        insert into t_user(username,password,realname,idcard,department_id,hiredate,telephone,education,address,sex
+        ,birth,remarks)
+        values (#{username},#{password},#{realname},#{idcard},#{department_id},
+         #{hiredate},#{telephone},#{education},
+        #{address},#{sex},#{birth},#{remarks})
+    </insert>
+    <delete id="remove" parameterType="long">
+        delete
+        from t_user
+        where id = #{id}
+    </delete>
+    <update id="update" parameterType="long">
+        update t_user
+        <set>
+        username=#{username},
+        password=#{password},
+        realname=#{realname},
+        idcard=#{idcard},
+        department=#{department},
+        hiredate=#{hiredate},
+        telephone=#{telephone},
+            education=#{education},
+            address=#{address},
+            sex=#{sex},
+            birth=#{birth},
+            remarks=#{remarks}
+        </set>
+        where id = #{id}
+    </update>
+    <select id="loadOne" parameterType="long" resultType="user">
+        select *
+        from t_user
+        where id = #{id};
+    </select>
+    <select id="loadAll" resultType="user">
+        select *
+        from t_user
+    </select>
+    <sql id="querySql">
+        <where>
+            <if test="keyWords!=null and keyWords!=''">
+                and name like concat("%",#{keyWords},"%")
+            </if>
+        </where>
+    </sql>
+    <select id="query" parameterType="userQuery" resultType="user">
+        select * from t_user
+        <include refid="querySql"/>
+        limit #{start},#{pageSize}
+    </select>
+    <select id="queryCount" parameterType="userQuery" resultType="long">
+        select count(*) from t_user
+        <include refid="querySql"/>
+    </select>
+
+
+    <select id="queryByName" parameterType="string" resultType="user" >
+        SELECT * FROM t_user WHERE username = #{name}
+    </select>
+
+</mapper>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ares.mapper.RevertMapper">
+    <insert id="save" parameterType="Revert">
+        insert into t_revert(revert_num, borrow_id, user_id, revertdate, note)
+        values(#{revertNum},#{borrow.id},#{user.id},#{revertdate},#{note})
+    </insert>
+</mapper>

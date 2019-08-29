@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ares.mapper.RecordTypeMapper">
+    <select id="loadAll" resultType="recordType">
+        select * from t_record_type;
+    </select>
+    <select id="loadOne" parameterType="long" resultType="recordType">
+         select * from t_record_type
+         WHERE  id=#{id}
+    </select>
+    <insert id="save" parameterType="recordType">
+        INSERT INTO t_record_type (sncode, name) VALUES (#{sncode},#{name})
+    </insert>
+    <delete id="remove" parameterType="long">
+        DELETE FROM t_record_type WHERE id=#{id}
+    </delete>
+    <update id="update" parameterType="long">
+        UPDATE t_record_type SET name=#{name},sncode=#{sncode} WHERE id=#{id}
+    </update>
+    <sql id="querySql">
+        <where>
+            <if test="keyWords!=null and keyWords!=''">
+                and name like concat("%",#{keyWords},"%")
+            </if>
+        </where>
+    </sql>
+    <select id="query" parameterType="RecordTypeQuery" resultType="recordType">
+        select * from t_record_type
+        <include refid="querySql"/>
+        limit #{start},#{pageSize}
+    </select>
+    <select id="queryCount" parameterType="RecordTypeQuery" resultType="long">
+        select count(*) from t_record_type
+        <include refid="querySql"/>
+    </select>
+</mapper>

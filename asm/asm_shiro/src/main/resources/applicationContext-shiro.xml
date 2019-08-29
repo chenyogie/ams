@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="sessionManager" class="com.ares.tools.AMSSessionManager" ></bean>
+
+    <!--shiro的安全管理器-->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <!--session管理机制-->
+        <property name="sessionManager" ref="sessionManager"></property>
+        <property name="realm" ref="AMSRealm" />
+    </bean>
+    <!--自定义的Realm-->
+    <bean id="AMSRealm" class="com.ares.shiro.AMSRealm">
+        <!--密码匹配器-->
+        <property name="credentialsMatcher">
+            <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+                <!--加密方式-->
+                <property name="hashAlgorithmName" value="MD5" />
+                <!--加密次数-->
+                <property name="hashIterations" value="5" />
+            </bean>
+        </property>
+    </bean>
+
+    <!--权限的注解支持功能-->
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator
+                    " depends-on="lifecycleBeanPostProcessor"/>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor" >
+        <property name="securityManager" ref="securityManager" />
+    </bean>
+
+
+    <!--拿到生成map的工厂-->
+    <bean id="filterChainDefinitionMapFactory" class="com.ares.shiro.FilterChainDefinitionMapFactory" />
+    <!--实体工厂-->
+    <bean id="filterChainDefinitionMap" factory-bean= "filterChainDefinitionMapFactory"
+          factory-method="createFilterChainDefinitionMap"/>
+
+    <!--自定义过滤器-->
+    <bean id="AMSPermissions" class="com.ares.tools.AMSAuthenticationFilter" />
+
+    <!--shiro真正的过滤器,id与web.xml中的一致-->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager" />
+        <property name="loginUrl" value="/login" />
+        <property name="successUrl" value="/Home" />
+        <property name="unauthorizedUrl" value="/404" />
+
+        <!--自定义过滤器-->
+        <property name="filters">
+            <map>
+                <entry key="AMSPermissions"  value-ref="AMSPermissions"/>
+            </map>
+        </property>
+
+        <!--资源请求的放行与拦截-->
+        <!--<property name="filterChainDefinitionMap" ref="filterChainDefinitionMap" />-->
+        <property name="filterChainDefinitions">
+            <value>
+                /login = anon
+                /** = AMSPermissions
+            </value>
+        </property>
+    </bean>
+
+</beans>

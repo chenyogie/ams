@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ares.mapper.ProblematicDocMapper">
+    <select id="loadAll" resultMap="problematicDocMap">
+        select
+        pro.id,
+        pro.accidentdate,
+        pro.remark,
+        rec.id recId,
+        rec.num recNum,
+        u.id uId,
+        u.username username,
+        dic.id dicId,
+        dic.name dicName
+        from t_problematicdoc pro
+        left join t_record rec on pro.doc_id=rec.id
+        left join t_user u on pro.user_id=u.id
+        left join t_dictionarydetail dic on pro.dictionarydetail_id=dic.id
+    </select>
+
+    <insert id="save" parameterType="problematicDoc">
+        INSERT into t_problematicdoc(doc_id,user_id,accidentdate,dictionarydetail_id,remark)
+        VALUES(#{doc.id},#{user.id},#{accidentdate},#{dictionarydetail.id},#{remark})
+    </insert>
+
+    <insert id="update" parameterType="problematicDoc">
+        UPDATE t_problematicdoc SET user_id=#{user.id},accidentdate=#{accidentdate},
+        dictionarydetail_id=#{dictionarydetail.id},remark=#{remark} WHERE id=#{id}
+    </insert>
+
+    <!--void remove(Serializable id);-->
+    <delete id="remove" parameterType="long">
+        DELETE FROM t_problematicdoc WHERE id=#{id}
+    </delete>
+
+    <!--结果映射-->
+    <resultMap id="problematicDocMap" type="ProblematicDoc">
+        <!--普通字段-->
+        <id property="id" column="id"></id>
+        <result property="accidentdate" column="accidentdate"></result>
+        <result property="remark" column="remark"></result>
+        <!--关联属性-->
+        <association property="dictionarydetail" javaType="DictionaryDetail">
+            <id property="id" column="dicId"></id>
+            <result property="name" column="dicName"></result>
+        </association>
+        <association property="doc" javaType="Record">
+            <id property="id" column="recId"></id>
+            <result property="num" column="recNum"></result>
+        </association>
+        <association property="user" javaType="User">
+            <id property="id" column="uId"></id>
+            <result property="username" column="username"></result>
+        </association>
+    </resultMap>
+
+    <!--通过配置的id查询数据字典明细
+    <select id="queryDictionaryDetailById" resultType="DictionaryDetail"
+            parameterType="long">
+        SELECT  dic.id,dic.name FROM  t_dictionarydetail dic where id = #{id}
+    </select>
+    通过配置的id查询文档
+    <select id="queryRecordById" resultType="Record"
+            parameterType="long">
+        SELECT  rec.id,rec.num FROM  t_record rec where id = #{id}
+    </select>
+    通过配置的id查询操作用户
+    <select id="queryUserById" resultType="User"
+            parameterType="long">
+        SELECT  u.id,u.username FROM  t_user u where id = #{id}
+    </select>-->
+
+    <sql id="whereSql">
+        <where>
+            <if test="keyWords!=null and keyWords!=''">
+                and rec.num like concat('%',#{keyWords},'%')
+            </if>
+            <if test="beginDate != null and beginDate != ''">
+                and pro.accidentdate <![CDATA[>=]]> #{beginDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                and pro.accidentdate <![CDATA[<=]]> #{endDate}
+            </if>
+            <if test="status != null and status != ''">
+                and dic.centralVal = #{status}
+            </if>
+        </where>
+    </sql>
+    <select id="queryCount" parameterType="ProblematicDocQuery" resultType="long">
+        select count(*) from t_problematicdoc pro
+        left join t_record rec on pro.doc_id=rec.id
+        left join t_user u on pro.user_id=u.id
+        left join t_dictionarydetail dic on pro.dictionarydetail_id=dic.id
+        <include refid="whereSql"/>
+    </select>
+
+    <select id="query" parameterType="ProblematicDocQuery" resultMap="problematicDocMap">
+        select
+        pro.id,
+        pro.accidentdate,
+        pro.remark,
+        rec.id recId,
+        rec.num recNum,
+        u.id uId,
+        u.username username,
+        dic.id dicId,
+        dic.name dicName
+        from t_problematicdoc pro
+        left join t_record rec on pro.doc_id=rec.id
+        left join t_user u on pro.user_id=u.id
+        left join t_dictionarydetail dic on pro.dictionarydetail_id=dic.id
+        <include refid="whereSql"/>
+        limit #{start},#{pageSize}
+    </select>
+</mapper>

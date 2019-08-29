@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ares.mapper.SiteMapper">
+    <!--添加-->
+    <insert id="save" parameterType="Site">
+        insert into t_site (location,name,linkman,remark)
+        values (#{name},#{location},#{linkman},#{remark})
+    </insert>
+    <!--删除-->
+    <delete id="remove" parameterType="long">
+        delete
+        from t_site
+        where id = #{id}
+    </delete>
+    <!--修改-->
+    <update id="update" parameterType="long">
+        update t_site
+        set name=#{name},location=#{location},linkman=#{linkman},remark=#{remark}
+        where id = #{id}
+    </update>
+    <!--查询一个-->
+    <select id="loadOne" parameterType="long" resultType="site">
+        select *
+        from t_site
+        where id = #{id};
+    </select>
+    <select id="loadAll" resultType="site">
+        select *
+        from t_site
+    </select>
+    <!--查询条件 -->
+    <sql id="querySql">
+        <where>
+            <if test="keyWords!=null and keyWords!=''">
+                and name like concat("%",#{keyWords},"%")
+            </if>
+        </where>
+    </sql>
+    <select id="query" parameterType="siteQuery" resultType="site">
+        select * from t_site
+        <include refid="querySql"/>
+        limit #{start},#{pageSize}
+    </select>
+    <select id="queryCount" parameterType="siteQuery" resultType="long">
+        select count(*) from t_site
+        <include refid="querySql"/>
+    </select>
+</mapper>

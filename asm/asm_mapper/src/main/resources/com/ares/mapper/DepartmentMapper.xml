@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ares.mapper.DepartmentMapper">
+    <!--void save(T t);-->
+    <insert id="save" parameterType="Department">
+        INSERT INTO  t_department(name,phone,fax,deptPath,superior_id,principal_id,remark,status)
+        VALUES(#{name},#{phone},#{fax},#{deptPath},#{superior.id},#{principal.id},#{remark},#{status})
+    </insert>
+    <!--void remove(Serializable id);-->
+    <delete id="remove" parameterType="long">
+        DELETE FROM t_department where id = #{id}
+    </delete>
+    <!--void update(T t);-->
+    <update id="update" parameterType="Department">
+        update t_department name = #{name},phone = #{phone},fax = #{fax},deptPath = #{deptPath},superior_id = #{superior.id},
+        principal_id = #{principal.id},remark = #{remark},status = #{status} where id = #{id}
+    </update>
+    <!--T loadById(Serializable id);-->
+    <select id="loadOne" parameterType="long" resultType="Department">
+        SELECT  * from t_department where id = #{id}
+    </select>
+    <!--List<T> loadAll();-->
+    <select id="loadAll" resultType="Department">
+        SELECT  * from t_department
+    </select>
+    <!--高级查询-->
+    <sql id="whereSql">
+        <where>
+            <if test="keyWords!=null and keyWords!=''">
+                and (
+                d.name like concat('%',#{keyWords},'%') OR
+                d.phone like concat('%',#{keyWords},'%') OR
+                d.fax like concat('%',#{keyWords},'%') OR
+                d.remark like concat('%',#{keyWords},'%')
+                )
+            </if>
+        </where>
+    </sql>
+    <!--Long loadCount(BaseQuery query);-->
+    <select id="queryCount" parameterType="DepartmentQuery" resultType="long">
+        select count(*) from t_department d
+        <include refid="whereSql"/>
+    </select>
+    <!--List<T> loadAllByQuery(BaseQuery query);-->
+    <select id="query" parameterType="DepartmentQuery" resultMap="DepartmentMap">
+        SELECT
+        d.id,
+        d.name,
+        d.phone,
+        d.fax,
+        d.deptPath,
+        d.remark,
+        d.status,
+        p.id pid,
+        p.username,
+        s.id sid,
+        s.name sname
+        FROM
+        t_department d
+        LEFT JOIN t_user p ON d.principal_id = p.id
+        LEFT JOIN t_department s ON d.superior_id = s.id
+        <include refid="whereSql"/>
+        limit #{start},#{pageSize}
+    </select>
+
+    <resultMap id="DepartmentMap" type="Department">
+        <!--基本信息-->
+        <id property="id" column="id"></id>
+
+        <result property="name" column="name"></result>
+        <result property="phone" column="phone"></result>
+        <result property="fax" column="fax"></result>
+        <result property="deptPath" column="deptPath"></result>
+        <result property="remark" column="remark"></result>
+
+        <!--关联信息-->
+        <!--private Employee principal;// 部门主管 员工对象-->
+        <association property="principal" javaType="User">
+            <id property="id" column="pid"></id>
+            <result property="username" column="username"></result>
+        </association>
+        <!--private Department superior;// 上级部门 部门对象-->
+        <association property="superior" javaType="Department">
+            <id property="id" column="sid"></id>
+            <result property="name" column="sname"></result>
+        </association>
+    </resultMap>
+
+    
+</mapper>
+

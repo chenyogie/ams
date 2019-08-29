@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ares.mapper.RecordMapper">
+    <update id="update" parameterType="com.ares.domain.Record">
+        update t_record
+        set site_id=#{site.id},
+            num=#{num},
+            headline=#{headline},
+            createuser_id=#{createuser.id},
+            createdate=#{createDate},
+            updateuser_id=#{updateuser.id},
+            updatedate=#{updateDate},
+            borrowstatus=#{borrowstatus},
+            expirationdate=#{expirationdate},
+            expirationnotice=#{expirationnotice},
+            advancedate=#{advancedate},
+            content=#{content},
+            introduce=#{introduce},
+            oftenuse=#{oftenuse},
+            f_num=#{f_num},
+            c_department=#{c_department.id},
+            g_department=#{g_department.id},
+            ratify=#{ratify},
+            authenticate=#{authenticate},
+            product_num=#{product_num},
+            raw_num=#{raw_num},
+            f_count=#{f_count},
+            f_page=#{f_page},
+            patent=#{patent},
+            check_user_id=#{checkUser.id},
+            f_status=#{f_status},
+            type_id=#{type.id},
+            ogm_user=#{ogm_user.id}
+        where id = #{id}
+    </update>
+
+    <update id="changeDocState" parameterType="com.ares.domain.Record">
+        update t_record set f_status=#{f_status} where id=#{id}
+    </update>
+
+    <insert id="save" parameterType="Record" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into t_record(site_id, num, headline, createuser_id, createdate, updateuser_id,
+                             updatedate, borrowstatus,expirationdate,expirationnotice, advancedate,
+                             content, introduce, oftenuse, f_num, c_department,
+                             g_department, ratify, authenticate, product_num, raw_num,
+                             f_count, f_page, patent, check_user_id, f_status, type_id, ogm_user)
+        VALUES (#{site.id}, #{num}, #{headline}, #{createuser.id}, #{createDate}, #{updateuser.id}, #{updateDate},
+                #{borrowstatus}, #{expirationdate},
+                #{ expirationnotice}, #{ advancedate}, #{content}, #{introduce}, #{oftenuse}, #{f_num},
+                #{c_department.id}, #{g_department.id}, #{ratify}, #{authenticate},
+                #{product_num}, #{raw_num}, #{f_count}, #{f_page}, #{patent}, #{checkUser.id}, #{f_status}, #{type.id},
+                #{ogm_user.id})
+    </insert>
+
+    <select id="loadOne" parameterType="long" resultType="Record">
+        select *
+        from t_record
+        where id = #{id};
+    </select>
+
+    <select id="loadAll" resultMap="RecordMaps">
+      SELECT
+            r.*, t.id tid,
+            t.name typename,
+            t.name ttname,
+            s.id sid,
+            s.location location,
+            u.username uname,
+            u1.username uenamer,
+            c.name dname,
+            g.name gname,
+            ch.username checkname,
+            ty.name  tyname,
+            og.username  ogname
+        FROM
+            t_record r
+        LEFT JOIN t_record_type t on r.type_id = t.id
+        LEFT JOIN t_site s on r.site_id = s.id
+        LEFT JOIN t_user u on r.createuser_id=u.id
+        LEFT JOIN t_user u1 on r.updateuser_id=u.id
+        LEFT JOIN t_department c on r.c_department=c.id
+        LEFT JOIN t_department g on r.g_department=g.id
+        LEFT JOIN t_user ch on r.check_user_id=ch.id
+        LEFT JOIN t_record_type ty on r.type_id=ty.id
+        LEFT JOIN t_user og on r.ogm_user=og.id
+    </select>
+    <resultMap id="RecordMaps" type="Record">
+        <id property="id" column="id"/>
+        <result property="num" column="num"/>
+        <result property="headline" column="headline"/>
+        <result property="createDate" column="createdate"/>
+        <result property="borrowstatus" column="borrowstatus"/>
+        <result property="expirationdate" column="expirationdate"/>
+        <result property="expirationnotice" column="expirationnotice"/>
+        <result property="advancedate" column="advancedate"/>
+        <result property="content" column="content"/>
+        <result property="introduce" column="introduce"/>
+        <result property="oftenuse" column="oftenuse"/>
+        <result property="f_num" column="f_num"/>
+        <result property="ratify" column="ratify"/>
+        <result property="authenticate" column="authenticate"/>
+        <result property="product_num" column="product_num"/>
+        <result property="raw_num" column="raw_num"/>
+        <result property="f_count" column="f_count"/>
+        <result property="f_page" column="f_page"/>
+        <result property="patent" column="patent"/>
+        <result property="f_status" column="f_status"/>
+
+
+        <association property="site" javaType="Site">
+            <id property="id" column="id"></id>
+            <result property="name" column="ttname"></result>
+        </association>
+        <association property="updateuser" javaType="User">
+            <id property="id" column="id"></id>
+            <result property="username" column="uenamer"></result>
+        </association>
+        <association property="checkUser" javaType="User">
+            <id property="id" column="id"></id>
+            <result property="username" column="checkname"></result>
+        </association>
+        <association property="createuser" javaType="User">
+            <id property="id" column="id"></id>
+            <result property="username" column="uname"></result>
+        </association>
+        <association property="ogm_user" javaType="User">
+            <id property="id" column="id"></id>
+            <result property="username" column="ogname"></result>
+        </association>
+        <association property="c_department" javaType="Department">
+            <id property="id" column="id"></id>
+            <result property="name" column="dname"></result>
+        </association>
+        <association property="g_department" javaType="Department">
+            <id property="id" column="id"></id>
+            <result property="name" column="gname"></result>
+        </association>
+        <association property="type" javaType="RecordType">
+            <id property="id" column="id"></id>
+            <result property="name" column="sname"></result>
+        </association>
+    </resultMap>
+    <delete id="remove" parameterType="long">
+        delete
+        from t_record
+        where id = #{id}
+    </delete>
+
+    <select id="query" parameterType="RecordQuery" resultMap="RecordMap">
+        SELECT r.*,
+        t.id tid,
+        t.name typename,
+        t.sncode,
+        s.id sid,
+        s.location location
+        FROM t_record r
+        LEFT JOIN t_record_type t on r.type_id = t.id
+        LEFT JOIN t_site s on r.site_id = s.id
+        <include refid="sqlQuery"/>
+        limit #{start},#{pageSize}
+    </select>
+    <resultMap id="RecordMap" type="record">
+        <id property="id" column="id"/>
+        <result property="num" column="num"/>
+        <result property="headline" column="headline"/>
+        <result property="createDate" column="createdate"/>
+        <result property="borrowstatus" column="borrowstatus"/>
+        <result property="expirationdate" column="expirationdate"/>
+        <result property="expirationnotice" column="expirationnotice"/>
+        <result property="advancedate" column="advancedate"/>
+        <result property="content" column="content"/>
+        <result property="introduce" column="introduce"/>
+        <result property="oftenuse" column="oftenuse"/>
+        <result property="f_num" column="f_num"/>
+        <result property="ratify" column="ratify"/>
+        <result property="authenticate" column="authenticate"/>
+        <result property="product_num" column="product_num"/>
+        <result property="raw_num" column="raw_num"/>
+        <result property="f_count" column="f_count"/>
+        <result property="f_page" column="f_page"/>
+        <result property="patent" column="patent"/>
+        <result property="f_status" column="f_status"/>
+        <!--<result property="c_department" column="c_department"/>
+        <result property="g_department" column="g_department"/>
+        <result property="updateuser_id" column="site_id"/>
+        <result property="check_user_id" column="site_id"/>
+        <result property="createuser_id" column="site_id"/>
+        <result property="ogm_user" column="site_id"/>-->
+        <!--<result property="type_id" column="site_id"/>-->
+        <association property="type" javaType="recordType">
+            <id property="id" column="tid"/>
+            <result property="name" column="typename"/>
+        </association>
+        <!--<result property="site" column="site"/>-->
+        <association property="site" javaType="site">
+            <id property="id" column="sid"/>
+            <result property="location" column="location"/>
+        </association>
+    </resultMap>
+
+    <select id="queryCount" resultType="long">
+        SELECT count(*)
+        FROM t_record r
+        LEFT JOIN t_record_type t on r.type_id = t.id
+        LEFT JOIN t_site s on r.site_id = s.id
+        <include refid="sqlQuery"/>
+    </select>
+
+    <sql id="sqlQuery">
+        <where>
+            <if test="recStates != null and recStates != ''">
+                and r.f_status = #{recStates}
+            </if>
+            <if test="keyWords!=null and keyWords!=''">
+                and r.num like concat('%',#{keyWords},'%')
+            </if>
+            <if test="headline!=null and headline!=''">
+                and headline like concat("%",#{headline},"%")
+            </if>
+            <if test="location!=null and location!=''">
+                and location = #{location}
+            </if>
+            <if test="typename!=null and typename!=''">
+                and t.name = #{typename}
+            </if>
+            <if test="num!=null and num!=''">
+                and num = #{num}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

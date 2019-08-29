@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.ares.mapper.PermissionMapper">
+    
+    <select id="loadPermissionByidentifying" parameterType="long" resultType="Permission">
+       SELECT p.* FROM t_role_permission trp
+       LEFT JOIN t_permission p ON trp.permission_identifying = p.identifying
+       WHERE trp.role_identifying = #{identifying}
+    </select>
+
+    
+    <!--void save(T t);String sn, Long identifying, String name, String url, Integer status-->
+    <insert id="save" parameterType="Permission">
+        INSERT INTO t_permission(sn,identifying,name,url,status) VALUES (#{sn},#{identifying},#{name},#{url},#{status})
+    </insert>
+
+    <!--void remove(Serializable id);-->
+    <delete id="remove" parameterType="long" >
+        DELETE FROM t_permission WHERE id = #{id}
+    </delete>
+
+    <!--void update(T t);-->
+    <update id="update" parameterType="Permission" >
+        UPDATE t_permission
+        SET sn = #{sn},identifying = #{identifying},name = #{name},url = #{url},status = #{sttus}
+    </update>
+
+    <!--T loadOne(Serializable id);-->
+    <select id="loadOne" parameterType="long" resultType="Permission" >
+        SELECT * FROM t_permission WHERE id = #{id}
+    </select>
+
+    <!--List<T> loadAll();-->
+    <select id="loadAll" resultType="Permission">
+        SELECT * FROM t_permission
+    </select>
+    <!--分页查询-->
+    <sql id="permissionSql">
+        <where>
+            <if test="keyWords != null and keyWords != ''">
+                AND (sn LIKE concat('%',#{keyWords},'%') or name like concat('%',#{keyWords},'%'))
+            </if>
+        </where>
+    </sql>
+    <!--Long queryCount(BaseQuery query);-->
+    <select id="queryCount" parameterType="PermissionQuery" resultType="long">
+        SELECT COUNT(*) FROM t_permission
+        <include refid="permissionSql" />
+    </select>
+
+    <!--List<T> query(BaseQuery query);-->
+    <resultMap id="PMMap" type="Permission" >
+        <id property="id" column="id" />
+        <result property="sn" column="sn" />
+        <result property="identifying" column="identifying" />
+        <result property="name" column="name" />
+        <result property="url" column="url" />
+        <result property="status" column="status" />
+        <association property="parent_id" javaType="Permission" >
+            <result property="identifying" column="tpd" />
+            <result property="name" column="tpName" />
+        </association>
+        <collection property="menus" javaType="arrayList"
+                    ofType="Menu"
+                    column="menu_id"
+                    select="com.ares.mapper.PermissionMapper.queryMenu"
+        />
+    </resultMap>
+    <select id="query" parameterType="PermissionQuery" resultMap="PMMap" >
+        SELECT p.*,tp.identifying tpd,tp.name tpName FROM t_permission p
+        LEFT JOIN t_permission tp ON p.parent_id=tp.id
+        <include refid="permissionSql" />
+        limit #{start},#{pageSize}
+    </select>
+
+    <!--关联查询-->
+    <resultMap id="PerMap" type="Permission" >
+        <id property="id" column="id" />
+        <result property="sn" column="sn" />
+        <result property="identifying" column="identifying" />
+        <result property="name" column="name" />
+        <result property="url" column="url" />
+        <result property="menu_id" column="menu_id" />
+        <result property="status" column="status" />
+        <collection property="menus" javaType="arrayList"
+                ofType="Menu"
+                column="menu_id"
+                select="com.ares.mapper.PermissionMapper.queryMenu"
+        />
+    </resultMap>
+    <select id="queryPerMenu" parameterType="PermissionQuery" resultMap="PerMap" >
+      SELECT * FROM t_permission
+      <include refid="permissionSql" />
+    </select>
+    <resultMap id="MMap" type="Menu">
+        <id property="id" column="id" />
+        <result property="sn" column="sn" />
+        <result property="name" column="name" />
+        <result property="icon" column="icon" />
+        <result property="status" column="status" />
+    </resultMap>
+    <select id="queryMenu" resultMap="MMap" >
+        SELECT * FROM t_menu WHERE sn = #{menu_id}
+    </select>
+    
+    <select id="loadPermissionTree" resultMap="PTreeMap">
+        SELECT p.*,tp.identifying tpd,tp.name tpName FROM t_permission p
+        LEFT JOIN t_permission tp ON p.identifying = p.parent_id
+        WHERE p.parent_id is NULL 
+    </select>
+    <resultMap id="PTreeMap" type="Permission">
+        <id property="id" column="id" />
+        <result property="sn" column="sn"/>
+        <result property="identifying" column="identifying" />
+        <result property="name" column="name" />
+        <result property="url" column="url" />
+        <result property="status" column="status" />
+        <association property="parent_id" javaType="Permission"
+                  >
+            <result property="identifying" column="tpd" />
+            <result property="name" column="tpName" />
+        </association>
+    </resultMap>
+
+
+    <!--<select id="loadPermissionByUser" resultType="Permission" parameterType="long">
+
+    </select>-->
+</mapper>
+

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/asm.iml" filepath="$PROJECT_DIR$/asm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/asm_common/asm_common.iml" filepath="$PROJECT_DIR$/asm_common/asm_common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/asm_core/asm_core.iml" filepath="$PROJECT_DIR$/asm_core/asm_core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/asm_fullTextIndex/asm_fullTextIndex.iml" filepath="$PROJECT_DIR$/asm_fullTextIndex/asm_fullTextIndex.iml" />
+      <module fileurl="file://$PROJECT_DIR$/asm_mapper/asm_mapper.iml" filepath="$PROJECT_DIR$/asm_mapper/asm_mapper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/asm_service/asm_service.iml" filepath="$PROJECT_DIR$/asm_service/asm_service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/asm_util/asm_util.iml" filepath="$PROJECT_DIR$/asm_util/asm_util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/asm_web/asm_web.iml" filepath="$PROJECT_DIR$/asm_web/asm_web.iml" />
+    </modules>
+  </component>
+</project>
